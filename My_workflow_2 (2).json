@@ -1,0 +1,166 @@
+{
+  "name": "My workflow 2",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an AI assistant helping a Scrum Master manage daily stand-up updates from the team.\n\nHere is today’s stand-up entry:\n\n- **Name:** {{ $json['Column 1'] }}\n- **What will you do today?** {{ $json['What will you do today?'] }}\n- **Any blockers?** {{ $json['Any blockers?'] }}\n- **Urgency Level:** {{ $json['Urgency Level'] }}\n- **Timestamp:** {{ $json.Timestamp }}\n\nYour task:\n1. Summarize this update in one concise sentence.\n2. Identify if any blockers are reported and suggest action steps if blockers exist.\n3. Based on the urgency level, recommend whether this task should be escalated to the Scrum Master.\n4. Output your response in the following format:\n\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        180,
+        -200
+      ],
+      "id": "4c8e1887-4e77-4444-b50c-7a14d23fd5e7",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        200,
+        100
+      ],
+      "id": "7d3f9648-3860-47e7-b820-d64a845eda84",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "YB1H9nSP6SHY10dQ",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -200,
+        -200
+      ],
+      "id": "0893e66d-7080-410c-aaed-db7dbbeea15b",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1ouxAvy-lzbXZ5c6v0_I6Rbhb3wt1LKD8jbDe9dw54JM",
+          "mode": "list",
+          "cachedResultName": "Daily Standup Sheet (Responses)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ouxAvy-lzbXZ5c6v0_I6Rbhb3wt1LKD8jbDe9dw54JM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1117679776,
+          "mode": "list",
+          "cachedResultName": "Form Responses 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ouxAvy-lzbXZ5c6v0_I6Rbhb3wt1LKD8jbDe9dw54JM/edit#gid=1117679776"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        -40,
+        -200
+      ],
+      "id": "fb6895be-731c-40f8-8511-9b32189fa062",
+      "name": "Google Sheets2",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "m4GbvA3AAo38i3Zt",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Google Sheets2').item.json.Email }}",
+        "subject": "Task Reviewer ",
+        "emailType": "text",
+        "message": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        560,
+        -200
+      ],
+      "id": "5ed89a20-b9a8-44ec-be5f-53a6c0f6098f",
+      "name": "Gmail",
+      "webhookId": "f936aafa-fb49-4708-9c2a-1241c1a1f88c",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "evCHCU0be0eMPkc3",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Gmail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets2": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c53c33df-757a-4022-a4af-f5fcf6e2496e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9a054e590ffc89fc7616a56871924176edba07ca6386aede847ebc4a680f5e4d"
+  },
+  "id": "K64gcopIbJ2snIk9",
+  "tags": []
+}
